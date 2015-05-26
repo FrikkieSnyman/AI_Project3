@@ -4,8 +4,14 @@ public class Trainer{
 	private Double momentum;
 	private Integer maxEpoch;
 	private Integer epoch = 0;
-		
-	public Trainer(Double learningRate, Double momentum, Integer maxEpoch){
 
+	public Trainer(Double learningRate, Double momentum, Integer maxEpoch){
+		this.learningRate = learningRate;
+		this.momentum = momentum;
+		this.maxEpoch = maxEpoch;
+	}
+
+	public NeuralNetwork getNeuralNetwork(){
+		return nn;
 	}
 }
