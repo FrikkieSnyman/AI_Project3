@@ -22,7 +22,7 @@ public class NeuralNetwork{
 		}
 		// Input bias node
 		Node tmpBias = new Node(0,99);
-		tmpBias.setInput(-1.0);
+		tmpBias.addToWeightedSum(-1.0);
 		inputNodes.add(tmpBias);
 
 		// Create hidden nodes
@@ -34,6 +34,8 @@ public class NeuralNetwork{
 		for (Node inputNode : inputNodes){
 			for (Node hiddenNode : hiddenNodes){
 				Edge tmpEdge = new Edge(inputNodes.size());
+				tmpEdge.setFromNode(inputNode);
+				tmpEdge.setToNode(hiddenNode);
 				inputToHidden.add(tmpEdge);
 				inputNode.addToOutgoingEdges(tmpEdge);
 				hiddenNode.addToIncomingEdges(tmpEdge);
@@ -42,7 +44,7 @@ public class NeuralNetwork{
 
 		// Hidden bias node
 		tmpBias = new Node(1,99);
-		tmpBias.setInput(-1.0);
+		tmpBias.addToWeightedSum(-1.0);
 		hiddenNodes.add(tmpBias);
 
 		// Create output nodes
@@ -54,10 +56,65 @@ public class NeuralNetwork{
 		for (Node hiddenNode : hiddenNodes){
 			for (Node outputNode : outputNodes){
 				Edge tmpEdge = new Edge(hiddenNodes.size());
+				tmpEdge.setFromNode(hiddenNode);
+				tmpEdge.setToNode(outputNode);
 				hiddenToOutput.add(tmpEdge);
 				hiddenNode.addToOutgoingEdges(tmpEdge);
 				outputNode.addToIncomingEdges(tmpEdge);
 			}
 		}
+	}
+
+	public Double[] putThroughNetwork(int[] inputs){
+		Double[] outputResults = new Double[outputNodes.size()];
+		Double[] scaledInputs = scale(inputs);
+
+		for (int i = 0; i < scaledInputs.length; ++i){
+			Node inputNode = inputNodes.get(i);
+			inputNode.addToWeightedSum(scaledInputs[i]);
+		}
+
+		for (Node hiddenNode : hiddenNodes){
+			for (Edge edge : hiddenNode.getIncomingEdges()){
+				Node input = edge.getFromNode();
+				Double weight = edge.getWeight();
+				hiddenNode.addToWeightedSum(input.activationFunction()*weight);
+			}
+		}
+
+		int count = 0;
+		for (Node outputNode : outputNodes){
+			for (Edge edge : outputNode.getIncomingEdges()){
+				Node hiddenNode = edge.getFromNode();
+				Double weight = edge.getWeight();
+				outputNode.addToWeightedSum(hiddenNode.activationFunction()*weight);
+			}
+			outputResults[count] = outputNode.activationFunction();
+			count++;
+		}
+		return outputResults;
+	}
+
+	private Double[] scale(int[] inputs){
+		Double[] scaledInputs = new Double[inputs.length];
+
+		Double targetMax = Math.sqrt(3);
+		Double targetMin = -targetMax;
+		int min = inputs[0];
+		int max = inputs[0];
+
+		for (int i = 1; i < inputs.length; ++i){
+			if (inputs[i] < min){
+				min = inputs[i];
+			} else if (inputs[i] > max){
+				max = inputs[i];
+			}
+		}
+
+		for (int i = 0; i < inputs.length; ++i){
+			scaledInputs[i] = ((((double)inputs[i] - (double)min)/((double)max - (double)min))*(targetMax - targetMin))+(targetMin);
+		}
+
+		return scaledInputs;
 	}
 }
