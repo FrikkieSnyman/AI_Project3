@@ -5,10 +5,11 @@ public class Trainer{
 	private Integer maxEpoch;
 	private Integer epoch = 0;
 
-	public Trainer(Double learningRate, Double momentum, Integer maxEpoch){
+	public Trainer(Double learningRate, Double momentum, Integer maxEpoch, int numInputs, int numHidden, int numOutput){
 		this.learningRate = learningRate;
 		this.momentum = momentum;
 		this.maxEpoch = maxEpoch;
+		nn = new NeuralNetwork(numInputs, numHidden, numOutput);
 	}
 
 	public NeuralNetwork getNeuralNetwork(){
