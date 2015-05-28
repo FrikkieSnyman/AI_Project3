@@ -8,6 +8,46 @@ public class NeuralNetwork{
 	private LinkedList<Edge> hiddenToOutput;
 	public Integer[] inputs;
 
+	public LinkedList<Node> getInputNodes(){
+		return inputNodes;
+	}
+
+	public void setInputNodes(LinkedList<Node> inputNodes){
+		this.inputNodes = inputNodes;
+	}
+
+	public LinkedList<Node> getHiddenNodes(){
+		return hiddenNodes;
+	}
+
+	public void setHiddenNodes(LinkedList<Node> hiddenNodes){
+		this.hiddenNodes = hiddenNodes;
+	}
+
+	public LinkedList<Node> getOutputNodes(){
+		return outputNodes;
+	}
+
+	public void setOutputNodes(LinkedList<Node> outputNodes){
+		this.outputNodes = outputNodes;
+	}
+
+	public LinkedList<Edge> getInputToHidden(){
+		return inputToHidden;
+	}
+
+	public void setInputToHidden(LinkedList<Edge> inputToHidden){
+		this.inputToHidden = inputToHidden;
+	}
+
+	public LinkedList<Edge> getHiddenToOutput(){
+		return hiddenToOutput;
+	}
+
+	public void setHiddenToOutput(LinkedList<Edge> hiddenToOutput){
+		this.hiddenToOutput = hiddenToOutput;
+	}
+
 	public NeuralNetwork(int numInputs, int numHidden, int numOutputs){
 		inputNodes = new LinkedList<>();
 		hiddenNodes = new LinkedList<>();
@@ -21,7 +61,7 @@ public class NeuralNetwork{
 			inputNodes.add(new Node(0,i));
 		}
 		// Input bias node
-		Node tmpBias = new Node(0,99);
+		Node tmpBias = new Node(0,-1);
 		tmpBias.addToWeightedSum(-1.0);
 		inputNodes.add(tmpBias);
 
@@ -43,7 +83,7 @@ public class NeuralNetwork{
 		}
 
 		// Hidden bias node
-		tmpBias = new Node(1,99);
+		tmpBias = new Node(1,-1);
 		tmpBias.addToWeightedSum(-1.0);
 		hiddenNodes.add(tmpBias);
 
@@ -66,6 +106,7 @@ public class NeuralNetwork{
 	}
 
 	public Double[] putThroughNetwork(int[] inputs){
+		resetAllSums();
 		Double[] outputResults = new Double[outputNodes.size()];
 		Double[] scaledInputs = scale(inputs);
 
@@ -116,5 +157,17 @@ public class NeuralNetwork{
 		}
 
 		return scaledInputs;
+	}
+
+	private void resetAllSums(){
+		for (Node inputNode : inputNodes){
+			inputNode.resetWeightedSum();
+		}
+		for (Node hiddenNode : hiddenNodes){
+			hiddenNode.resetWeightedSum();
+		}
+		for (Node outputNode : outputNodes){
+			outputNode.resetWeightedSum();
+		}
 	}
 }

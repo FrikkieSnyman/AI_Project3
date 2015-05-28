@@ -4,7 +4,6 @@ public class Node{
 	private Integer type; //0 - input; 1 - hidden; 2 - output
 	private LinkedList<Edge> incomingEdges;
 	private LinkedList<Edge> outgoingEdges;
-	// private Double input;
 	private Double weightedSum = 0.0;
 	Integer count;
 	public Node(Integer type, Integer count){
@@ -14,12 +13,16 @@ public class Node{
 		this.count = count;
 	}
 
-	// public void setInput(Double input){
-	// 	this.input = input;
-	// }
-
 	public void addToWeightedSum(Double weightedInput){
 		weightedSum += weightedInput;
+	}
+
+	public void resetWeightedSum(){
+		if (count != -1){
+			weightedSum = 0.0;
+		} else {
+			weightedSum = -1.0;
+		}
 	}
 
 	public LinkedList<Edge> getIncomingEdges(){
