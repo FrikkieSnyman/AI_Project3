@@ -7,6 +7,11 @@ import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.AbstractMap.SimpleEntry;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Trainer{
 	private NeuralNetwork nn;
@@ -33,7 +38,17 @@ public class Trainer{
 		nn = new NeuralNetwork(numInputs, numHidden, numOutput);
 	}
 
-	public void train(){
+	public void train(int iteration){
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HHmmss");
+		Calendar cal = Calendar.getInstance();
+		PrintWriter writer = null;
+		try{
+			writer = new PrintWriter("files/"+dateFormat.format(cal.getTime())+iteration+".csv","UTF-8");
+			writer.println("Epoch,Training Accuracy,Generalization Accuracy");
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
 		String afrikaansFile = pathToTraining + "afrikaans.txt";
 		String englishFile = pathToTraining + "english.txt";
 
@@ -42,6 +57,7 @@ public class Trainer{
 
 		LinkedList<SimpleEntry<String,String>> dataSet = buildList(afrikaans);
 		dataSet.addAll(buildList(english));
+		dataSet = shuffleDataset(dataSet);
 		int accuracy;
 		Boolean classified = true;
 
@@ -206,8 +222,10 @@ public class Trainer{
 			generalizationAccuracy = generalizationAccuracy / generalizationSetSize * 100;
 			// System.out.println(nn.getHiddenToOutput().get(0).getWeight() + " " + nn.getHiddenNodes().get(0).getOutgoingEdges().get(0).getWeight());
 			System.out.println("Epoch: "+ epoch + "\nTraining accuracy: " + accuracyPercentage + "\nGeneralization accuracy: " + generalizationAccuracy);
+			writer.println(epoch+","+accuracyPercentage+","+generalizationAccuracy);
 
 		}
+		writer.close();
 	}
 
 
@@ -269,5 +287,14 @@ public class Trainer{
 			e.printStackTrace();
 		}
 		return lines;
+	}
+
+	private LinkedList<SimpleEntry<String,String>> shuffleDataset(LinkedList<SimpleEntry<String,String>> data){
+		LinkedList<SimpleEntry<String,String>> dataSet = new LinkedList<>();
+		while(data.size() != 0){
+			dataSet.add(data.remove(RandomGenerator.randomInteger(0,data.size()-1)));
+		}
+
+		return dataSet;
 	}
 }
